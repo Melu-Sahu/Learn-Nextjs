@@ -8,7 +8,7 @@ const connection: ConnectionObject = {};
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/mistrymsg";
 
 
-async function dbConnect(): Promise<void> {
+export default async function dbConnect(): Promise<void> {
 
     if (connection.isConnected) {
         console.log("Already connected to database");
@@ -26,9 +26,6 @@ async function dbConnect(): Promise<void> {
         process.exit(1);
     }
 }
-
-
-
 
 
 if (!MONGODB_URI) {
