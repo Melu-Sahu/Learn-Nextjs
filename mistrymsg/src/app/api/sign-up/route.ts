@@ -19,6 +19,7 @@ export async function POST(request: Request) {
             }), { status: 400 });
         }
 
+        // check that if username is present and verified
         const existingUserVerifiedByUsername = await UserModel.findOne({ username, isVerified: true });
         if (existingUserVerifiedByUsername) {
             return new Response(JSON.stringify({
@@ -26,19 +27,19 @@ export async function POST(request: Request) {
                 message: "Username already taken",
             }), { status: 400 });
         }
+        // check that if email is present
         const existingUserByEmail = await UserModel.findOne({ email });
 
         if (existingUserByEmail) {
-
-            if(existingUserByEmail.isVerified) {
+            if (existingUserByEmail.isVerified) {
                 return new Response(JSON.stringify({
                     success: false,
                     message: "Email already registered",
                 }), { status: 400 });
-            }else {
+            } else {
                 // If the user exists but is not verified, we can choose to resend the verification email or allow them to update their details.
                 // For simplicity, let's just inform them to verify their email.
-               
+
                 const hashedPassword = await bcrypt.hash(password, 10);
                 const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();  // 6-digit code(otp)
                 const verifyCodeExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
@@ -47,6 +48,8 @@ export async function POST(request: Request) {
                 existingUserByEmail.password = hashedPassword; // Update password
                 existingUserByEmail.verifyCode = verifyCode;
                 existingUserByEmail.verifyCodeExpiry = verifyCodeExpiry;
+                existingUserByEmail.messages = [];
+
 
                 await existingUserByEmail.save();
 
@@ -62,12 +65,12 @@ export async function POST(request: Request) {
 
                 return new Response(JSON.stringify({
                     success: true,
-                    message: "User details updated. Please verify your email.",
+                    message: "User details updated. A new verification email sent to your registered email, please verify first.",
                     data: String(existingUserByEmail._id),
                 }), { status: 200 });
             }
 
-        }else {
+        } else {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();  // 6-digit code(otp)
@@ -86,28 +89,22 @@ export async function POST(request: Request) {
 
             const saveduser = await newUser.save();
 
+            // Send verification email only after user creation
+            const emailResponse = await sendVerificationEmail(email, username, verifyCode);
+            if (!emailResponse.success) {
+                return new Response(JSON.stringify({
+                    success: false,
+                    message: "Failed to send verification email",
+                    error: emailResponse.error,
+                }), { status: 500 });
+            }
+
             return new Response(JSON.stringify({
                 success: true,
-                message: "User registered successfully. Please verify your email.",
+                message: "User registered successfully. A verification email sent to your provided email, please verify it.",
                 data: String(saveduser._id),
             }), { status: 201 });
         }
-
-        // Send verification email only after user creation
-        const emailResponse = await sendVerificationEmail(email, username, verifyCode);
-        if (!emailResponse.success) {
-            return new Response(JSON.stringify({
-                success: false,
-                message: "Failed to send verification email",
-                error: emailResponse.error,
-            }), { status: 500 });
-        }
-
-        return new Response(JSON.stringify({
-            success: true,
-            message: "User registered successfully. Please verify your email.",
-            data: saveduser._id.toString(),
-        }), { status: 201 });
 
     } catch (error) {
         console.error("Error in sign-up route:", error);
@@ -118,4 +115,3 @@ export async function POST(request: Request) {
         }, { status: 500 });
     }
 }
-
