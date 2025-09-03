@@ -50,7 +50,6 @@ export async function POST(request: Request) {
                 existingUserByEmail.verifyCodeExpiry = verifyCodeExpiry;
                 existingUserByEmail.messages = [];
 
-
                 await existingUserByEmail.save();
 
                 // Send verification email

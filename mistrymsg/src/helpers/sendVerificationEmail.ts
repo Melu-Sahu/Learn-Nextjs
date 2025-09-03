@@ -16,7 +16,6 @@ export const sendVerificationEmail = async (emialTo: string, username: string, o
             }),
         });
 
-
         return {
             success: true, 
             message: "Verification email sent successfully",
