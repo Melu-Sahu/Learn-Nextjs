@@ -1,13 +1,13 @@
 import Link from "next/link";
 
-export default function App() {
+export default function Home() {
   return (
     <div className="">
-      <h3>next js app page</h3>
+      <h3>next js home page</h3>
 
       <div className="font-sans flex items-center justify-items-center  p-8 gap-8 sm:p-20">
-        <Link href="/home" className="text-blue-500 underline">
-          Go to Home
+        <Link href="/" className="text-blue-500 underline">
+          Go to Back
         </Link>
         <Link href="/services" className="text-blue-500 underline">
           Go to Services
