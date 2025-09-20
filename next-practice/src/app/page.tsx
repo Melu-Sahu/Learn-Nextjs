@@ -12,6 +12,10 @@ export default function App() {
         <Link href="/services" className="text-blue-500 underline">
           Go to Services
         </Link>
+
+        <Link href={'/products'} className="text-blue-500 underline">
+          Go To Products Page
+        </Link>
       </div>
     </div>
   );

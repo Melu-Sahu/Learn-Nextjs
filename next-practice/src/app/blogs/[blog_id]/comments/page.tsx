@@ -1,9 +1,17 @@
+import { notFound } from "next/navigation";
 
 
 export default async function CommentPage({params, searchParams}: {params: Promise<any>, searchParams: Promise<any>}) {
 
   console.log("Params", await params);
   console.log("SearchParams", await searchParams);
+
+  if((await params).blog_id == '1234'){
+    notFound();
+  }
+
+
+  
 
 
   return <div>Comments Page
