@@ -7,6 +7,10 @@ export default async function ProductDetails({
 }) {
   const {product_id} =  params;
 
+  if(product_id === "0"){
+    notFound();
+  }
+
 
   console.log("Product Id is : ", product_id)
 
